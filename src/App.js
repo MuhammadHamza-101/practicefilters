@@ -1,25 +1,65 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { useEffect, useState } from "react";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [loading, setLoading] = useState(false);
+  const [values, setValues] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(
+      "https://raw.githubusercontent.com/iamspruce/search-filter-painate-reactjs/main/data/countries.json"
+    )
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          setLoading(true);
+          setValues(result);
+          console.log(result);
+        },
+        (error) => {
+          setLoading(true);
+          setError(error);
+        }
+      );
+  }, []);
+
+  const data = Object.values(values);
+  if (error) {
+    return <>{error.message}</>;
+  } else if (!loading) {
+    return <>Loading......</>;
+  } else {
+    return (
+      <div className="wrapper">
+        <ul className="card-grid">
+          {data.map((item) => (
+            <li key={item.alpha3Code}>
+              <article className="card">
+                <div className="card-image">
+                  <img src={item.flag.large} alt={item.name} />
+                </div>
+                <div className="card-content">
+                  <h2 className="card-name">{item.name}</h2>
+                  <ol className="card-list">
+                    <li>
+                      population: <span>{item.population}</span>
+                    </li>
+                    <li>
+                      Region: <span>{item.region}</span>
+                    </li>
+                    <li>
+                      Capital: <span>{item.capital}</span>
+                    </li>
+                  </ol>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 }
 
 export default App;
